@@ -144,12 +144,47 @@ ozone_theme_t ozone_theme_gruvbox_dark = {
    "gruvbox_dark"                                  /* name */
 };
 
+ozone_theme_t ozone_theme_flux = {
+   /* Background color */
+   COLOR_HEX_TO_FLOAT(0xEBEBEB, 1.00f),             /* background */
+   ozone_background_libretro_running_flux, /* background_libretro_running */
+
+   /* Float colors for quads and icons */
+   COLOR_HEX_TO_FLOAT(0x2B2B2B, 1.00f),             /* header_footer_separator */
+   COLOR_HEX_TO_FLOAT(0x333333, 1.00f),             /* text */
+   COLOR_HEX_TO_FLOAT(0xFFFFFF, 1.00f),             /* selection */
+   COLOR_HEX_TO_FLOAT(0x10BEC5, 1.00f),             /* selection_border */
+   COLOR_HEX_TO_FLOAT(0xCDCDCD, 1.00f),             /* entries_border */
+   COLOR_HEX_TO_FLOAT(0x333333, 1.00f),             /* entries_icon */
+   COLOR_HEX_TO_FLOAT(0x374CFF, 1.00f),             /* text_selected */
+   COLOR_HEX_TO_FLOAT(0xF0F0F0, 1.00f),             /* message_background */
+
+   /* RGBA colors for text */
+   0x333333FF,                                     /* text_rgba */
+   0x374CFFFF,                                     /* text_selected_rgba */
+   0x878787FF,                                     /* text_sublabel_rgba */
+
+   /* Sidebar color */
+   ozone_sidebar_background_flux,          /* sidebar_background */
+   ozone_sidebar_gradient_top_flux,        /* sidebar_top_gradient */
+   ozone_sidebar_gradient_bottom_flux,     /* sidebar_bottom_gradient */
+
+   /* Fancy cursor colors */
+   ozone_border_0_flux,                    /* cursor_border_0 */
+   ozone_border_1_flux,                    /* cursor_border_1 */
+
+   {0},                                            /* textures */
+
+   "flux"                                  /* name */
+};
+
 
 ozone_theme_t *ozone_themes[] = {
    &ozone_theme_light,
    &ozone_theme_dark,
    &ozone_theme_nord,
-   &ozone_theme_gruvbox_dark
+   &ozone_theme_gruvbox_dark,
+   &ozone_theme_flux
 };
 
 unsigned ozone_themes_count                 = sizeof(ozone_themes) / sizeof(ozone_themes[0]);
@@ -184,6 +219,9 @@ void ozone_set_color_theme(ozone_handle_t *ozone, unsigned color_theme)
       case 3:
          theme = &ozone_theme_gruvbox_dark;
          break;
+      case 4:
+         theme = &ozone_theme_flux;
+         break;         
       default:
          break;
    }

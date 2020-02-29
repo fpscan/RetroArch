@@ -127,6 +127,27 @@ static float ozone_sidebar_gradient_bottom_gruvbox_dark[16] = {
       0.1960784f, 0.1882353f, 0.1843137f, 1.0f,
 };
 
+static float ozone_sidebar_background_flux[16] = {
+      0.94, 0.94, 0.94, 1.00,
+      0.94, 0.94, 0.94, 1.00,
+      0.94, 0.94, 0.94, 1.00,
+      0.94, 0.94, 0.94, 1.00,
+};
+
+static float ozone_sidebar_gradient_top_flux[16] = {
+      0.94, 0.94, 0.94, 1.00,
+      0.94, 0.94, 0.94, 1.00,
+      0.922, 0.922, 0.922, 1.00,
+      0.922, 0.922, 0.922, 1.00,
+};
+
+static float ozone_sidebar_gradient_bottom_flux[16] = {
+      0.922, 0.922, 0.922, 1.00,
+      0.922, 0.922, 0.922, 1.00,
+      0.94, 0.94, 0.94, 1.00,
+      0.94, 0.94, 0.94, 1.00,
+};
+
 static float ozone_border_0_light[16] = COLOR_HEX_TO_FLOAT(0x50EFD9, 1.00);
 static float ozone_border_1_light[16] = COLOR_HEX_TO_FLOAT(0x0DB6D5, 1.00);
 
@@ -138,6 +159,9 @@ static float ozone_border_1_nord[16] = COLOR_HEX_TO_FLOAT(0x88C0D0, 1.0f);
 
 static float ozone_border_0_gruvbox_dark[16] = COLOR_HEX_TO_FLOAT(0xAF3A03, 1.0f);
 static float ozone_border_1_gruvbox_dark[16] = COLOR_HEX_TO_FLOAT(0xFE8019, 1.0f);
+
+static float ozone_border_0_flux[16] = COLOR_HEX_TO_FLOAT(0x50EFD9, 1.00);
+static float ozone_border_1_flux[16] = COLOR_HEX_TO_FLOAT(0x0DB6D5, 1.00);
 
 static float ozone_background_libretro_running_light[16] = {
    0.690, 0.690, 0.690, 0.75,
@@ -165,6 +189,13 @@ static float ozone_background_libretro_running_gruvbox_dark[16] = {
    0.1568627f, 0.1568627f, 0.1568627f, 0.75f,
    0.1568627f, 0.1568627f, 0.1568627f, 1.0f,
    0.1568627f, 0.1568627f, 0.1568627f, 1.0f,
+};
+
+static float ozone_background_libretro_running_flux[16] = {
+   0.690, 0.690, 0.690, 0.75,
+   0.690, 0.690, 0.690, 0.75,
+   0.922, 0.922, 0.922, 1.0,
+   0.922, 0.922, 0.922, 1.0
 };
 
 typedef struct ozone_theme
@@ -208,6 +239,7 @@ extern ozone_theme_t ozone_theme_light;
 extern ozone_theme_t ozone_theme_dark;
 extern ozone_theme_t ozone_theme_nord;
 extern ozone_theme_t ozone_theme_gruvbox_dark;
+extern ozone_theme_t ozone_theme_flux;
 
 extern ozone_theme_t *ozone_themes[];
 
