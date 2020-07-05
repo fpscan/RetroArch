@@ -96,7 +96,7 @@ typedef struct cheevo_popup
    uintptr_t badge;
 } cheevo_popup;
 
-typedef struct menu_widget_msg
+typedef struct disp_widget_msg
 {
    char *msg;
    char *msg_new;
@@ -137,7 +137,7 @@ typedef struct menu_widget_msg
 
    float hourglass_rotation;
    gfx_timer_t hourglass_timer;
-} menu_widget_msg_t;
+} disp_widget_msg_t;
 
 typedef struct dispgfx_widget
 {
@@ -224,7 +224,7 @@ typedef struct dispgfx_widget
    uintptr_t gfx_widgets_generic_tag;
    gfx_widget_fonts_t gfx_widget_fonts;
    fifo_buffer_t *msg_queue;
-   menu_widget_msg_t* current_msgs[MSG_QUEUE_ONSCREEN_MAX];
+   disp_widget_msg_t* current_msgs[MSG_QUEUE_ONSCREEN_MAX];
    size_t current_msgs_size;
 #ifdef HAVE_THREADS
    slock_t* current_msgs_lock;
@@ -389,6 +389,11 @@ void gfx_widget_set_libretro_message(
       void *data,
       const char *message, unsigned duration);
 
+/* Warning: not thread safe! */
+void gfx_widget_set_progress_message(void *data,
+      const char *message, unsigned duration,
+      unsigned priority, int8_t progress);
+
 /* All the functions below should be called in
  * the video driver - once they are all added, set
  * enable_menu_widgets to true for that driver */
@@ -404,6 +409,7 @@ extern const gfx_widget_t gfx_widget_screenshot;
 extern const gfx_widget_t gfx_widget_volume;
 extern const gfx_widget_t gfx_widget_generic_message;
 extern const gfx_widget_t gfx_widget_libretro_message;
+extern const gfx_widget_t gfx_widget_progress_message;
 
 #ifdef HAVE_CHEEVOS
 extern const gfx_widget_t gfx_widget_achievement_popup;

@@ -224,12 +224,6 @@ const char* config_get_input_driver_options(void);
 bool input_driver_set_rumble_state(unsigned port,
       enum retro_rumble_effect effect, uint16_t strength);
 
-uint64_t input_driver_get_capabilities(void);
-
-const input_device_driver_t * input_driver_get_joypad_driver(void);
-
-const input_device_driver_t * input_driver_get_sec_joypad_driver(void);
-
 /**
  * input_sensor_set_state:
  * @port               : User number.
@@ -250,15 +244,9 @@ input_driver_t *input_get_ptr(void);
 
 void *input_get_data(void);
 
-void input_driver_set_flushing_input(void);
-
-bool input_driver_is_libretro_input_blocked(void);
-
 void input_driver_set_nonblock_state(void);
 
 void input_driver_unset_nonblock_state(void);
-
-void input_driver_set_own_driver(void);
 
 float *input_driver_get_float(enum input_action action);
 
@@ -325,31 +313,6 @@ const input_device_driver_t *input_joypad_init_driver(
    }
 
 /**
- * input_joypad_analog:
- * @drv                     : Input device driver handle.
- * @port                    : User number.
- * @idx                     : Analog key index.
- *                            E.g.:
- *                            - RETRO_DEVICE_INDEX_ANALOG_LEFT
- *                            - RETRO_DEVICE_INDEX_ANALOG_RIGHT
- *                            - RETRO_DEVICE_INDEX_ANALOG_BUTTON
- * @ident                   : Analog key identifier.
- *                            E.g.:
- *                            - RETRO_DEVICE_ID_ANALOG_X
- *                            - RETRO_DEVICE_ID_ANALOG_Y
- * @binds                   : Binds of user.
- *
- * Gets analog value of analog key identifiers @idx and @ident
- * from user with number @port with provided keybinds (@binds).
- *
- * Returns: analog value on success, otherwise 0.
- **/
-int16_t input_joypad_analog(const input_device_driver_t *driver,
-      rarch_joypad_info_t *joypad_info,
-      unsigned port, unsigned idx, unsigned ident,
-      const struct retro_keybind *binds);
-
-/**
  * input_joypad_set_rumble:
  * @drv                     : Input device driver handle.
  * @port                    : User number.
@@ -372,21 +335,7 @@ bool input_joypad_set_rumble(const input_device_driver_t *driver,
  **/
 void input_pad_connect(unsigned port, input_device_driver_t *driver);
 
-/**
- * input_mouse_button_raw:
- * @port                    : Mouse number.
- * @button                  : Identifier of key (libretro mouse constant).
- *
- * Checks if key (@button) was being pressed by user
- * with mouse number @port.
- *
- * Returns: true (1) if key was pressed, otherwise
- * false (0).
- **/
-bool input_mouse_button_raw(unsigned port, unsigned button);
-
 #ifdef HAVE_HID
-
 #include "include/hid_driver.h"
 
 /**
@@ -438,26 +387,6 @@ struct input_keyboard_ctx_wait
  **/
 void input_keyboard_event(bool down, unsigned code, uint32_t character,
       uint16_t mod, unsigned device);
-
-bool input_keyboard_line_append(const char *word);
-
-/**
- * input_keyboard_start_line:
- * @userdata                 : Userdata.
- * @cb                       : Line complete callback function.
- *
- * Sets function pointer for keyboard line handle.
- *
- * The underlying buffer can be reallocated at any time
- * (or be NULL), but the pointer to it remains constant
- * throughout the objects lifetime.
- *
- * Returns: underlying buffer of the keyboard line.
- **/
-const char **input_keyboard_start_line(void *userdata,
-      input_keyboard_line_complete_t cb);
-
-bool input_keyboard_ctl(enum rarch_input_keyboard_ctl_state state, void *data);
 
 extern struct retro_keybind input_config_binds[MAX_USERS][RARCH_BIND_LIST_END];
 extern struct retro_keybind input_autoconf_binds[MAX_USERS][RARCH_BIND_LIST_END];

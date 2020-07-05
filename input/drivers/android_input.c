@@ -1062,11 +1062,7 @@ static void handle_hotplug(android_input_t *android,
     */
    else if(
             (
-               strstr(device_model, "R800x") ||
-               strstr(device_model, "R800at") ||
-               strstr(device_model, "R800i") ||
-               strstr(device_model, "R800a") ||
-               strstr(device_model, "R800") ||
+               string_starts_with_size(device_model, "R800", STRLEN_CONST("R800")) ||
                strstr(device_model, "Xperia Play") ||
                strstr(device_model, "Play") ||
                strstr(device_model, "SO-01D")
@@ -1117,9 +1113,16 @@ static void handle_hotplug(android_input_t *android,
    }
 
    /* Amazon Fire TV & Fire stick */
-   else if (strstr(device_model, "AFTB") || strstr(device_model, "AFTT") ||
-           strstr(device_model, "AFTS") || strstr(device_model, "AFTM") ||
-           strstr(device_model, "AFTRS"))
+   else if (
+             string_starts_with_size(device_model, "AFT", STRLEN_CONST("AFT")) &&
+             (
+              strstr(device_model, "AFTB") || 
+              strstr(device_model, "AFTT") ||
+              strstr(device_model, "AFTS") || 
+              strstr(device_model, "AFTM") ||
+              strstr(device_model, "AFTRS")
+             )
+         )
    {
       RARCH_LOG("Special Device Detected: %s\n", device_model);
       {
@@ -1462,9 +1465,6 @@ static int16_t android_input_state(void *data,
          }
          break;
       case RETRO_DEVICE_ANALOG:
-         if (binds[port])
-            return input_joypad_analog(android->joypad, joypad_info,
-                  port, idx, id, binds[port]);
          break;
       case RETRO_DEVICE_KEYBOARD:
          return (id < RETROK_LAST) && BIT_GET(android_key_state[ANDROID_KEYBOARD_PORT], rarch_keysym_lut[id]);

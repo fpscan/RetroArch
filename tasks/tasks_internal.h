@@ -32,10 +32,7 @@
 #include "../core_updater_list.h"
 #endif
 
-#if defined(HAVE_NETWORKING)
-/* Required for task_push_pl_entry_thumbnail_download() */
 #include "../playlist.h"
-#endif
 
 /* Required for task_push_core_backup() */
 #include "../core_backup.h"
@@ -84,6 +81,8 @@ void *task_push_http_post_transfer_with_user_agent(const char* url, const char* 
 
 task_retriever_info_t *http_task_get_transfer_list(void);
 
+bool task_push_bluetooth_scan(retro_task_callback_t cb);
+
 bool task_push_wifi_scan(retro_task_callback_t cb);
 
 bool task_push_netplay_lan_scan(retro_task_callback_t cb);
@@ -121,7 +120,8 @@ bool task_push_pl_entry_thumbnail_download(
 
 #ifdef HAVE_MENU
 bool task_push_pl_thumbnail_download(
-      const char *system, const char *playlist_path,
+      const char *system,
+      const playlist_config_t *playlist_config,
       const char *dir_thumbnails);
 #endif
 
@@ -147,8 +147,8 @@ bool task_push_core_restore(const char *backup_path,
       const char *dir_libretro,
       bool *core_loaded);
 
-bool task_push_pl_manager_reset_cores(const char *playlist_path);
-bool task_push_pl_manager_clean_playlist(const char *playlist_path);
+bool task_push_pl_manager_reset_cores(const playlist_config_t *playlist_config);
+bool task_push_pl_manager_clean_playlist(const playlist_config_t *playlist_config);
 
 bool task_push_image_load(const char *fullpath,
       bool supports_rgba, unsigned upscale_threshold,
@@ -163,7 +163,9 @@ bool task_push_dbscan(
       retro_task_callback_t cb);
 #endif
 
-bool task_push_manual_content_scan(void);
+bool task_push_manual_content_scan(
+      const playlist_config_t *playlist_config,
+      const char *playlist_directory);
 
 #ifdef HAVE_OVERLAY
 bool task_push_overlay_load_default(

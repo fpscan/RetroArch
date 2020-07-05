@@ -1,4 +1,17 @@
 # Future
+- BLUETOOTH: Add a Bluetooth driver (Lakka-only for now)
+- CHEEVOS: Restore display of unlocked achievements across hardcore modes
+- CHEEVOS: Hash buffered data when available
+- CONFIG FILE: Optimise parsing of configuration files
+- D3D9/D3D11: Fix core-initiated D3D9/D3D11 driver switches
+- DRIVERS: Add 'Ignore null drivers' setting. When enabled, won't allow the user to set a driver to nothing. Can prevent the user from locking him/herself out of the program.
+- FILE I/O: VFS and NBIO interfaces will now use 64-bit fseek/ftell where possible, should allow for reading/writing to files bigger than 2GB
+- IOS: Fixed iOS 6 version
+- LOCALIZATION: Updates for several languages (synchronized from Crowdin)
+- MENU: Enlarged INT/UINT selection limit from 999 to 9999
+- MENU: Fix cursor forced to first entry after displaying lists
+- ODROID GO ADVANCE: Video driver - fix race condition with RGUI callback
+- X11: Add lightgun support
 
 # 1.8.9
 - AUTO SAVESTATES: Ensure save states are correctly flushed to disk when quitting RetroArch (fixes broken save states when exiting RetroArch - without first closing content - with 'Auto Save State' enabled)

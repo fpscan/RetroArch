@@ -20,8 +20,6 @@
 #include "../../config.h"
 #endif
 
-#include <libpad.h>
-
 #include <boolean.h>
 #include <libretro.h>
 #include <retro_miscellaneous.h>
@@ -79,8 +77,6 @@ static int16_t ps2_input_state(void *data,
          }
          break;
       case RETRO_DEVICE_ANALOG:
-         if (binds[port])
-            return input_joypad_analog(ps2->joypad, joypad_info, port, idx, id, binds[port]);
          break;
    }
 
