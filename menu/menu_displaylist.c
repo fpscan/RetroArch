@@ -88,6 +88,7 @@
 #include "../record/record_driver.h"
 #include "../msg_hash_lbl_str.h"
 #include "menu_cbs.h"
+#include "../profile_manager.h"
 #include "menu_driver.h"
 #include "menu_entries.h"
 #if defined(HAVE_CG) || defined(HAVE_GLSL) || defined(HAVE_SLANG) || defined(HAVE_HLSL)
@@ -9864,13 +9865,10 @@ unsigned menu_displaylist_build_list(
                {MENU_ENUM_LABEL_PAUSE_ON_DISCONNECT,                                   PARSE_ONLY_BOOL,   true},
                {MENU_ENUM_LABEL_MENU_SAVESTATE_RESUME,                                 PARSE_ONLY_BOOL,   true},
                {MENU_ENUM_LABEL_MENU_INSERT_DISK_RESUME,                               PARSE_ONLY_BOOL,   true},
-               {MENU_ENUM_LABEL_QUIT_ON_CLOSE_CONTENT,                                 PARSE_ONLY_UINT,   true},
+               {MENU_ENUM_LABEL_NAVIGATION_WRAPAROUND,                                 PARSE_ONLY_BOOL,   true},
                {MENU_ENUM_LABEL_MENU_REMEMBER_SELECTION,                               PARSE_ONLY_UINT,   true},
                {MENU_ENUM_LABEL_MENU_STARTUP_PAGE,                                     PARSE_ONLY_UINT,   true},
-               {MENU_ENUM_LABEL_CONFIRM_QUIT,                                          PARSE_ONLY_BOOL,   true},
-               {MENU_ENUM_LABEL_CONFIRM_CLOSE,                                         PARSE_ONLY_BOOL,   true},
-               {MENU_ENUM_LABEL_CONFIRM_RESET,                                         PARSE_ONLY_BOOL,   true},
-               {MENU_ENUM_LABEL_NAVIGATION_WRAPAROUND,                                 PARSE_ONLY_BOOL,   true},
+               {MENU_ENUM_LABEL_QUIT_ON_CLOSE_CONTENT,                                 PARSE_ONLY_UINT,   true},
                {MENU_ENUM_LABEL_SHOW_ADVANCED_SETTINGS,                                PARSE_ONLY_BOOL,   true},
                {MENU_ENUM_LABEL_MENU_ENABLE_KIOSK_MODE,                                PARSE_ONLY_BOOL,   true},
                {MENU_ENUM_LABEL_MENU_KIOSK_MODE_PASSWORD,                              PARSE_ONLY_STRING, false},
@@ -10543,7 +10541,6 @@ unsigned menu_displaylist_build_list(
                {MENU_ENUM_LABEL_BATTERY_LEVEL_ENABLE,                                  PARSE_ONLY_BOOL, true  },
                {MENU_ENUM_LABEL_CORE_ENABLE,                                           PARSE_ONLY_BOOL, true  },
                {MENU_ENUM_LABEL_MENU_SHOW_SUBLABELS,                                   PARSE_ONLY_BOOL, true  },
-               {MENU_ENUM_LABEL_MENU_SHOW_CONFIRM,                                     PARSE_ONLY_BOOL, true  },
                {MENU_ENUM_LABEL_RGUI_SHOW_START_SCREEN,                                PARSE_ONLY_BOOL, true  },
             };
 
@@ -11189,6 +11186,123 @@ unsigned menu_displaylist_build_list(
                count++;
             break;
          }
+      case DISPLAYLIST_PROFILES_LIST:
+         {
+            int i;
+            const rarch_profile_list_t *profile_list = profile_manager_get_list();
+
+            /* Create Profile */
+            if (menu_entries_append(list,
+                     msg_hash_to_str(MENU_ENUM_LABEL_VALUE_PROFILE_CREATE),
+                     MENU_ENUM_LABEL_PROFILE_CREATE_STR,
+                     MENU_ENUM_LABEL_PROFILE_CREATE,
+                     MENU_SETTING_ACTION, 0, 0, NULL))
+               count++;
+
+            /* Save Settings to Current Profile */
+            if (menu_entries_append(list,
+                     msg_hash_to_str(MENU_ENUM_LABEL_VALUE_PROFILE_SAVE_CURRENT),
+                     MENU_ENUM_LABEL_PROFILE_SAVE_CURRENT_STR,
+                     MENU_ENUM_LABEL_PROFILE_SAVE_CURRENT,
+                     MENU_SETTING_ACTION, 0, 0, NULL))
+               count++;
+
+            /* List all profiles */
+            for (i = 0; i < profile_list->count; i++)
+            {
+               char label[64];
+               char display_name[192];
+               bool is_active = (i == profile_list->active_index);
+
+               snprintf(label, sizeof(label), "profile_select_%d", i);
+
+               if (is_active)
+                  snprintf(display_name, sizeof(display_name), "%s  [Active]",
+                        profile_list->profiles[i].name);
+               else
+                  snprintf(display_name, sizeof(display_name), "%s",
+                        profile_list->profiles[i].name);
+
+               if (menu_entries_append(list,
+                        display_name,
+                        label,
+                        MENU_ENUM_LABEL_PROFILE_SELECT,
+                        MENU_SETTING_ACTION, 0, i, NULL))
+                  count++;
+
+               /* Delete option for non-Default profiles */
+               if (i > 0)
+               {
+                  char del_label[64];
+                  char del_display[192];
+                  snprintf(del_label, sizeof(del_label), "profile_delete_%d", i);
+                  snprintf(del_display, sizeof(del_display), "  [Delete] %s",
+                        profile_list->profiles[i].name);
+                  if (menu_entries_append(list,
+                           del_display,
+                           del_label,
+                           MENU_ENUM_LABEL_PROFILE_DELETE,
+                           MENU_SETTING_ACTION, 0, i, NULL))
+                     count++;
+               }
+            }
+            break;
+         }
+
+      case DISPLAYLIST_PROFILE_ICONS_LIST:
+         {
+            char sysicons_dir[PATH_MAX_LENGTH];
+            struct string_list *dir_list = NULL;
+
+            profile_manager_get_sysicons_dir(sysicons_dir, sizeof(sysicons_dir));
+            if (*sysicons_dir)
+            {
+               dir_list = dir_list_new(sysicons_dir, "png", false, false, false, false);
+            }
+
+            if (dir_list)
+            {
+               size_t i;
+               dir_list_sort(dir_list, false);
+
+               for (i = 0; i < dir_list->size; i++)
+               {
+                  const char *path = dir_list->elems[i].data;
+                  char filename[128];
+                  fill_pathname_base(filename, path, sizeof(filename));
+
+                  if (menu_entries_append(list,
+                           filename,
+                           filename,
+                           MENU_ENUM_LABEL_PROFILE_ICON_SELECT,
+                           MENU_SETTING_ACTION, 0, 0, NULL))
+                     count++;
+               }
+               dir_list_free(dir_list);
+            }
+            else
+            {
+               static const char *fallback_icons[] = {
+                  "default.png",
+                  "Nintendo - Nintendo Switch.png",
+                  "Nintendo - Nintendo Entertainment System.png",
+                  "Nintendo - Super Nintendo Entertainment System.png",
+                  "Sony - PlayStation.png",
+                  "Sega - Mega Drive - Genesis.png"
+               };
+               size_t i;
+               for (i = 0; i < ARRAY_SIZE(fallback_icons); i++)
+               {
+                  if (menu_entries_append(list,
+                           fallback_icons[i],
+                           fallback_icons[i],
+                           MENU_ENUM_LABEL_PROFILE_ICON_SELECT,
+                           MENU_SETTING_ACTION, 0, 0, NULL))
+                     count++;
+               }
+            }
+            break;
+         }
       case DISPLAYLIST_PRIVACY_SETTINGS_LIST:
          {
             static const menu_displaylist_build_info_t build_list[] = {
@@ -11581,6 +11695,14 @@ unsigned menu_displaylist_build_list(
                         false) == 0)
                   count++;
             }
+
+            if (!settings->bools.kiosk_mode_enable)
+               if (menu_entries_append(list,
+                        msg_hash_to_str(MENU_ENUM_LABEL_VALUE_PROFILES_LIST),
+                        MENU_ENUM_LABEL_PROFILES_LIST_STR,
+                        MENU_ENUM_LABEL_PROFILES_LIST,
+                        MENU_SETTING_ACTION, 0, 0, NULL))
+                  count++;
          }
          break;
       case DISPLAYLIST_UPDATER_SETTINGS_LIST:
@@ -14968,6 +15090,8 @@ bool menu_displaylist_ctl(enum menu_displaylist_ctl_state type,
          case DISPLAYLIST_SETTINGS_ALL:
          case DISPLAYLIST_PRIVACY_SETTINGS_LIST:
          case DISPLAYLIST_CONFIGURATIONS_LIST:
+         case DISPLAYLIST_PROFILES_LIST:
+         case DISPLAYLIST_PROFILE_ICONS_LIST:
          case DISPLAYLIST_ONSCREEN_NOTIFICATIONS_SETTINGS_LIST:
          case DISPLAYLIST_ONSCREEN_NOTIFICATIONS_VIEWS_SETTINGS_LIST:
          case DISPLAYLIST_LATENCY_SETTINGS_LIST:

@@ -208,6 +208,62 @@ MSG_HASH(
    "Manage and create configuration files."
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PROFILES_LIST,
+   "Profiles"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_PROFILES_LIST,
+   "Manage and switch user profiles."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PROFILE_CREATE,
+   "Create Profile..."
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_PROFILE_CREATE,
+   "Create a new user profile."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PROFILE_SELECT,
+   "Select Profile"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_PROFILE_SELECT,
+   "Select this profile."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PROFILE_ICON_SELECT,
+   "Select Profile Icon"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_PROFILE_ICON_SELECT,
+   "Choose an icon for this profile."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PROFILE_SAVE_CURRENT,
+   "Save Settings to Current Profile"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_PROFILE_SAVE_CURRENT,
+   "Save current RetroArch settings to the active profile's configuration file."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PROFILE_SAVE_NEW,
+   "Save Current Settings to New Profile..."
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_PROFILE_SAVE_NEW,
+   "Create a new profile using the current settings as a starting point."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PROFILE_DELETE,
+   "Delete Profile"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_PROFILE_DELETE,
+   "Remove this profile permanently."
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_HELP_LIST,
    "Help"
    )
@@ -6639,14 +6695,6 @@ MSG_HASH(
 MSG_HASH(
    MENU_ENUM_SUBLABEL_MENU_SHOW_SUBLABELS,
    "Show additional information for menu items."
-   )
-MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_MENU_SHOW_CONFIRM,
-   "Show Confirmation Boxes"
-   )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_MENU_SHOW_CONFIRM,
-   "Ask for confirmation before quitting, resetting or closing content. When disabled these actions happen immediately."
    )
 MSG_HASH( /* FIXME Not RGUI specific */
    MENU_ENUM_LABEL_VALUE_RGUI_SHOW_START_SCREEN,

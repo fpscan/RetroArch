@@ -827,7 +827,6 @@ typedef struct settings
       bool menu_battery_level_enable;
       bool menu_core_enable;
       bool menu_show_sublabels;
-      bool menu_show_confirm;
       bool menu_dynamic_wallpaper_enable;
       bool menu_mouse_enable;
       bool menu_pointer_enable;

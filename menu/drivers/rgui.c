@@ -50,6 +50,7 @@
 
 #include "../../msg_hash_lbl_str.h"
 #include "../../configuration.h"
+#include "../../profile_manager.h"
 #include "../../file_path_special.h"
 #include "../../input/input_osk.h"
 #include "../../tasks/tasks_internal.h"
@@ -4566,23 +4567,21 @@ static void rgui_render_messagebox(
    int x, y;
    size_t i;
    char wrapped_message[MENU_LABEL_MAX_LENGTH];
-   unsigned width             = 0;
-   unsigned glyphs_width      = 0;
-   unsigned height            = 0;
-   unsigned line_count        = 0;
+   unsigned width           = 0;
+   unsigned glyphs_width    = 0;
+   unsigned height          = 0;
+   unsigned line_count      = 0;
    char *lines[128];
    size_t msg_len;
    size_t wrapped_len;
-   uint16_t *frame_buf_data   = rgui->frame_buf.data;
-   struct menu_state *menu_st = menu_state_get_ptr();
-   bool confirm_dialog        = (menu_st->dialog_st.confirm_cmd) ? true : false;
+   uint16_t *frame_buf_data = rgui->frame_buf.data;
 
-   wrapped_message[0]         = '\0';
+   wrapped_message[0]       = '\0';
 
-   msg_len                    = strlen(message);
+   msg_len                  = strlen(message);
 
    /* Split message into lines */
-   wrapped_len                = word_wrap(
+   wrapped_len              = word_wrap(
          wrapped_message, sizeof(wrapped_message),
          message, msg_len,
          rgui->term_layout.width,
@@ -4621,10 +4620,6 @@ static void rgui_render_messagebox(
    height                   = (unsigned)(rgui->font_height_stride * line_count + 6 + 10);
    x                        = ((int)fb_width  - (int)width) / 2;
    y                        = ((int)fb_height - (int)height) / 2;
-
-   /* Extra room for confirm buttons */
-   if (confirm_dialog)
-      height               += rgui->font_height_stride * 2;
 
    if (height > fb_height)
       height                = fb_height;
@@ -4695,77 +4690,6 @@ static void rgui_render_messagebox(
 
          rgui_blit_line(rgui, fb_width, text_x, text_y, msg,
                rgui->colors.normal_color, rgui->colors.shadow_color);
-      }
-
-      if (confirm_dialog)
-      {
-         const char *str_back                   = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_BASIC_MENU_CONTROLS_BACK);
-         const char *str_ok                     = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_BASIC_MENU_CONTROLS_OK);
-         unsigned str_back_width                = strlen(str_back) * rgui->font_width_stride;
-         unsigned str_ok_width                  = strlen(str_ok) * rgui->font_width_stride;
-         float icon_size                        = rgui->font_width_stride;
-         float icon_padding                     = icon_size / 2;
-         float icon_x                           = x + (icon_size * 3) + (icon_padding * 2);
-         float icon_y                           = fb_height - y + icon_size - (icon_padding * 2);
-         int cursor_x                           = icon_x - (icon_padding * 2);
-         int cursor_y                           = icon_y - icon_padding;
-         int cursor_w                           = icon_size + (icon_padding * 2) + str_back_width;
-         int cursor_h                           = icon_size + (icon_padding * 3);
-
-         /* Back */
-         if (     rgui->pointer.x >= cursor_x
-               && rgui->pointer.x <= cursor_x + cursor_w
-               && rgui->pointer.y >= cursor_y
-               && rgui->pointer.y <= cursor_y + cursor_h)
-         {
-            menu_st->dialog_st.confirm_hover_back = true;
-
-            rgui_fill_rect(frame_buf_data, fb_width, fb_height,
-                  cursor_x,
-                  cursor_y,
-                  cursor_w,
-                  cursor_h,
-                  rgui->colors.bg_dark_color, rgui->colors.bg_light_color,
-                  (rgui->flags & RGUI_FLAG_BG_THICKNESS) ? true : false);
-         }
-         else
-            menu_st->dialog_st.confirm_hover_back = false;
-
-         rgui_blit_line(rgui, fb_width, icon_x, icon_y, str_back,
-               (menu_st->dialog_st.confirm_hover_back)
-                     ? rgui->colors.hover_color
-                     : rgui->colors.normal_color,
-               rgui->colors.shadow_color);
-
-         /* OK */
-         icon_x  += width - (icon_size * 4) - (icon_padding * 8) - str_ok_width;
-
-         cursor_x = icon_x - (icon_padding * 2);
-         cursor_w = icon_size + (icon_padding * 2) + str_ok_width;
-
-         if (     rgui->pointer.x >= cursor_x
-               && rgui->pointer.x <= cursor_x + cursor_w
-               && rgui->pointer.y >= cursor_y
-               && rgui->pointer.y <= cursor_y + cursor_h)
-         {
-            menu_st->dialog_st.confirm_hover_ok = true;
-
-            rgui_fill_rect(frame_buf_data, fb_width, fb_height,
-                  cursor_x,
-                  cursor_y,
-                  cursor_w,
-                  cursor_h,
-                  rgui->colors.bg_dark_color, rgui->colors.bg_light_color,
-                  (rgui->flags & RGUI_FLAG_BG_THICKNESS) ? true : false);
-         }
-         else
-            menu_st->dialog_st.confirm_hover_ok = false;
-
-         rgui_blit_line(rgui, fb_width, icon_x, icon_y, str_ok,
-               (menu_st->dialog_st.confirm_hover_ok)
-                     ? rgui->colors.hover_color
-                     : rgui->colors.normal_color,
-               rgui->colors.shadow_color);
       }
    }
 }
@@ -5633,9 +5557,35 @@ static void rgui_render(void *data, unsigned width, unsigned height,
                rgui->colors.shadow_color);
       }
 
+      /* Print Profile Name */
+      size_t profile_len = 0;
+      {
+         char profile_name[128];
+         char profile_icon[PATH_MAX_LENGTH];
+         profile_manager_get_active(profile_name, sizeof(profile_name), profile_icon, sizeof(profile_icon));
+
+         if (profile_name[0])
+         {
+            profile_len = utf8len(profile_name);
+            if (powerstate_len || timedate_len)
+               profile_len++;
+
+            rgui_blit_line(rgui,
+                  fb_width,
+                  (int)(term_end_x
+                        - (powerstate_len * rgui->font_width_stride)
+                        - (timedate_len * rgui->font_width_stride)
+                        - (profile_len * rgui->font_width_stride)),
+                  title_y,
+                  profile_name,
+                  rgui->colors.hover_color,
+                  rgui->colors.shadow_color);
+         }
+      }
+
       /* Print title */
-      title_max_len = rgui->term_layout.width - powerstate_len - timedate_len;
-      if (powerstate_len || timedate_len)
+      title_max_len = rgui->term_layout.width - powerstate_len - timedate_len - profile_len;
+      if (powerstate_len || timedate_len || profile_len)
          title_max_len--;
 
       title_buf[0] = '\0';

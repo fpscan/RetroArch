@@ -35,6 +35,8 @@
 #include "file_path_special.h"
 #include "command.h"
 #include "configuration.h"
+#include "profile_manager.h"
+#include "profile_manager.c"
 #include "content.h"
 #include "config.def.h"
 #include "config.features.h"
@@ -2032,7 +2034,6 @@ static struct config_bool_setting *populate_settings_bool(
    SETTING_BOOL("menu_battery_level_enable",     &settings->bools.menu_battery_level_enable, true, true, false);
    SETTING_BOOL("menu_core_enable",              &settings->bools.menu_core_enable, true, true, false);
    SETTING_BOOL("menu_show_sublabels",           &settings->bools.menu_show_sublabels, true, DEFAULT_MENU_SHOW_SUBLABELS, false);
-   SETTING_BOOL("menu_show_confirm",             &settings->bools.menu_show_confirm, true, DEFAULT_MENU_SHOW_CONFIRM, false);
    SETTING_BOOL("menu_dynamic_wallpaper_enable", &settings->bools.menu_dynamic_wallpaper_enable, true, DEFAULT_MENU_DYNAMIC_WALLPAPER_ENABLE, false);
    SETTING_BOOL("menu_ticker_smooth",            &settings->bools.menu_ticker_smooth, true, DEFAULT_MENU_TICKER_SMOOTH, false);
    SETTING_BOOL("menu_scroll_fast",              &settings->bools.menu_scroll_fast, true, DEFAULT_MENU_SCROLL_FAST, false);
@@ -3562,9 +3563,23 @@ void config_set_defaults(void *data)
  */
 void config_load(void *data)
 {
-   global_t *global = (global_t*)data;
+   global_t *global            = (global_t*)data;
+   const char *config_path     = path_get(RARCH_PATH_CONFIG);
+
    config_set_defaults(global);
 #ifdef HAVE_CONFIGFILE
+   if (config_path && *config_path)
+   {
+      char config_dir[PATH_MAX_LENGTH];
+      char profile_redirect[PATH_MAX_LENGTH];
+      fill_pathname_basedir(config_dir, config_path, sizeof(config_dir));
+
+      profile_manager_init(config_dir, config_path);
+
+      if (profile_manager_get_startup_redirect(config_path,
+               profile_redirect, sizeof(profile_redirect)))
+         path_set(RARCH_PATH_CONFIG, profile_redirect);
+   }
    config_parse_file(global);
 #endif
 }
@@ -3937,6 +3952,27 @@ static bool config_load_file(global_t *global,
       conf = open_userdefaults_config_file();
    }
 #endif
+
+   if (conf)
+   {
+      const char *current_config_path = path_get(RARCH_PATH_CONFIG);
+      if (!path_is_empty(RARCH_PATH_CONFIG))
+      {
+         char config_dir[PATH_MAX_LENGTH];
+         char profile_redirect[PATH_MAX_LENGTH];
+         fill_pathname_basedir(config_dir, current_config_path, sizeof(config_dir));
+
+         profile_manager_init(config_dir, current_config_path);
+
+         if (profile_manager_get_startup_redirect(current_config_path,
+                  profile_redirect, sizeof(profile_redirect)))
+         {
+            config_file_free(conf);
+            path_set(RARCH_PATH_CONFIG, profile_redirect);
+            conf = config_file_new_from_path_to_string(profile_redirect);
+         }
+      }
+   }
 
    if (!conf)
    {
